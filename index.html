@@ -2,118 +2,23 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Project Body Recomposition | Selezione</title>
+    <title>Candidatura Recomposition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f1f5f9; }
-        .form-section { background: #0f172a; padding: 1.5rem; border-radius: 1rem; border: 1px solid #1e293b; }
-    </style>
 </head>
-<body class="p-4 md:p-10">
-
-    <main class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold text-emerald-400 mb-2">Project Body Recomposition</h1>
-        <p class="text-slate-400 mb-8">Compila attentamente per candidarti al percorso di 3-6 mesi.</p>
-
-        <form id="coaching-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+<body class="bg-slate-950 p-6 text-white">
+    <div class="max-w-xl mx-auto bg-slate-900 p-8 rounded-2xl">
+        <h1 class="text-2xl font-bold mb-6">Candidatura Recomposition</h1>
+        
+        <form action="mailto:tua-email@esempio.com" method="POST" enctype="text/plain" class="space-y-4">
             
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">NOME E COGNOME *</label>
-                <input type="text" id="form-name" required class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                
-                <label class="block text-xs font-bold text-slate-400 mt-4 mb-2">ETÀ *</label>
-                <select id="form-age" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <option value="under20">Meno di 20 anni</option>
-                    <option value="20-35" selected>Tra 20 e 35 anni</option>
-                    <option value="over35">Più di 35 anni</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">ACCETTI INVIO FOTO (PRIMA/DOPO)? *</label>
-                <select id="form-photos" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800 mb-4">
-                    <option value="yes">Sì, accetto</option>
-                    <option value="no">No</option>
-                </select>
-                <label class="block text-xs font-bold text-slate-400 mb-2">ACCETTI INVIO VIDEO TECNICI? *</label>
-                <select id="form-videos" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <option value="yes">Sì, registrerò</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">ALLENAMENTO IN ESTATE? *</label>
-                <select id="form-summer" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800 mb-4">
-                    <option value="yes">Sì, mi organizzo ovunque</option>
-                    <option value="no">No, stop</option>
-                </select>
-                <input type="text" id="form-stop-duration" placeholder="Durata eventuale stop" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">DISPONIBILITÀ PIANO ALIMENTARE? *</label>
-                <select id="form-diet" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <option value="yes">Sì, seguirò con rigore</option>
-                    <option value="no">Difficoltà a seguire piani fissi</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">LUOGO DI ALLENAMENTO *</label>
-                <select id="form-training-place" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <option value="gym">Palestra</option>
-                    <option value="homegym">Home Gym attrezzata</option>
-                    <option value="willing">Disposta a iscrivermi</option>
-                    <option value="no-equip">Solo corpo libero</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">TIMORI RIGUARDO AI PESI? *</label>
-                <select id="form-weight-fear" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <option value="no">Nessuna, voglio spingere</option>
-                    <option value="yes-bulky">Temo di diventare troppo muscolosa</option>
-                    <option value="yes-injury">Temo infortuni</option>
-                </select>
-            </div>
-
-            <div class="form-section">
-                <label class="block text-xs font-bold text-slate-400 mb-2">MOTIVAZIONE E STORICO *</label>
-                <textarea id="form-motivation" required rows="4" placeholder="Perché dovrei scegliere te?" class="w-full bg-slate-950 p-3 rounded-lg border border-slate-800"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-bold py-4 rounded-xl hover:bg-emerald-400 transition-all uppercase tracking-widest">
-                Invia Candidatura
-            </button>
+            <label class="block text-sm">Nome e Cognome</label>
+            <input type="text" name="Nome" required class="w-full p-2 bg-slate-800 rounded">
+            
+            <label class="block text-sm">Motivazione</label>
+            <textarea name="Motivazione" class="w-full p-2 bg-slate-800 rounded"></textarea>
+            
+            <button type="submit" class="w-full bg-emerald-500 p-3 rounded font-bold">Invia via Email</button>
         </form>
-    </main>
-
-    <script>
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            // Qui salveremo tutti i dati in un unico oggetto
-            const data = {
-                nome: document.getElementById('form-name').value,
-                eta: document.getElementById('form-age').value,
-                foto: document.getElementById('form-photos').value,
-                video: document.getElementById('form-videos').value,
-                estate: document.getElementById('form-summer').value,
-                stop: document.getElementById('form-stop-duration').value,
-                diet: document.getElementById('form-diet').value,
-                luogo: document.getElementById('form-training-place').value,
-                paure: document.getElementById('form-weight-fear').value,
-                motivazione: document.getElementById('form-motivation').value,
-                dataInvio: new Date().toLocaleDateString()
-            };
-
-            const leads = JSON.parse(localStorage.getItem('leads') || '[]');
-            leads.push(data);
-            localStorage.setItem('leads', JSON.stringify(leads));
-
-            alert("Candidatura registrata correttamente!");
-            document.getElementById('coaching-form').reset();
-        }
-    </script>
+    </div>
 </body>
 </html>
