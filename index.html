@@ -754,8 +754,18 @@ console.log("CIAO");
 fetch("https://script.google.com/macros/s/AKfycbzZ70FunSdnCTiO-YpPNUg775JWNebTh4ckhXkmeK1E6LfEj31FdKi_wCBcLVKFKgJh/exec", {
     method: "POST",
     body: JSON.stringify({
-        test: "FUNZIONA"
-    })
+    name: name,
+    contact: contact,
+    age: age,
+    photos: photos,
+    videos: videos,
+    summer: summer,
+    stop_duration: stop_duration,
+    diet: diet,
+    training_place: training_place,
+    weight_fear: weight_fear,
+    motivation: motivation
+})
 })
 .then(response => response.json())
 .then(data => {
