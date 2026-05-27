@@ -767,12 +767,15 @@
             const waEncodedText = encodeURIComponent(textSummary);
             document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${waPhone}?text=${waEncodedText}`;
 
-            // 2. Configura link Email
+            // 2. Configura invio Email (Metodo forzato)
             const emailReceiver = settings.email;
             const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
             const emailBody = encodeURIComponent(textSummary);
-            document.getElementById('btn-submit-email').href = `mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}`;
-            window.location.href = document.getElementById('btn-submit-email').href;
+            
+            // Assegniamo una funzione diretta al click del bottone
+            const emailBtn = document.getElementById('btn-submit-email');
+            emailBtn.setAttribute('onclick', `window.location.href='mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}'; return false;`);
+            emailBtn.href = "javascript:void(0)";
 
             // Nasconde il modulo e mostra la schermata di successo con i ponti di inoltro
             document.getElementById('coaching-form').classList.add('hidden');
