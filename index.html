@@ -751,9 +751,11 @@
      
 console.log("CIAO");
 
-fetch("https://script.google.com/macros/s/AKfycbzfX15hPKF3GqM4ZiFTMlS8-amc5E_cxVR9CSCjTsQ4tupLBzRGK0_sJuwGUA2uKpRn/exec", {
+fetch("https://script.google.com/macros/s/AKfycbxOgtEgoDAtcEwPI7w4Ls6KGmVICbMSqMMr8SE9rtGqsDpMiQ44dYlbTVvTKMnioQAg/exec", {
     method: "POST",
-    mode: "no-cors",
+    headers: {
+        "Content-Type": "application/json"
+    },  
     body: JSON.stringify({
     name: name,
     contact: contact,
