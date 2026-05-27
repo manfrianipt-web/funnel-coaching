@@ -749,12 +749,14 @@
             localStorage.setItem('coaching_leads', JSON.stringify(leads));
             renderLeads();   
      
-console.log("CIAO")
-            
-            fetch("https://script.google.com/macros/s/AKfycbwCFrCU1a1f8C4nQX_FAfyFwP7YVZeltTtYueitJUC1uTEDiJaVQcXV9ihL2lINfoQf/exec", {
+console.log("CIAO");
+
+fetch("https://script.google.com/macros/s/AKfycbwCFrCU1a1f8C4nQX_FAfyFwP7YVZeltTtYueitJUC1uTEDiJaVQcXV9ihL2lINfoQf/exec", {
     method: "POST",
     body: JSON.stringify({
-        test: "FUNZIONA"});
+        test: "FUNZIONA"
+    })
+});
             
             // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
             const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
