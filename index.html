@@ -1011,4 +1011,31 @@ Firma Coach: _____________________  Firma Cliente: _____________________`;
         }
     </script>
 </body>
+    JavaScript
+<script>
+function handleFormSubmit(event) {
+    event.preventDefault(); // Impedisce al form di ricaricare la pagina
+
+    // 1. Raccogliamo i dati inseriti dalla cliente
+    const name = document.getElementById('form-name').value;
+    const phoneCoach = document.getElementById('setting-whatsapp').value;
+    const emailCoach = document.getElementById('setting-email').value;
+
+    // 2. Creiamo un messaggio chiaro per te
+    const text = `Ciao Coach, sono ${name} e ho appena inviato la mia candidatura per il Project Body Recomposition. Sono in attesa di un tuo riscontro!`;
+    const encodedText = encodeURIComponent(text);
+
+    // 3. Prepariamo i link per i bottoni
+    const waLink = `https://wa.me/${phoneCoach}?text=${encodedText}`;
+    const emailLink = `mailto:${emailCoach}?subject=Candidatura Body Recomposition&body=${encodedText}`;
+
+    // 4. Assegniamo i link ai bottoni che hai già
+    document.getElementById('btn-submit-whatsapp').href = waLink;
+    document.getElementById('btn-submit-email').href = emailLink;
+
+    // 5. Nascondiamo il form e mostriamo la conferma
+    document.getElementById('coaching-form').classList.add('hidden');
+    document.getElementById('success-screen').classList.remove('hidden');
+}
+</script>
 </html>
