@@ -772,6 +772,7 @@
             const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
             const emailBody = encodeURIComponent(textSummary);
             document.getElementById('btn-submit-email').href = `mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}`;
+            window.location.href = document.getElementById('btn-submit-email').href;
 
             // Nasconde il modulo e mostra la schermata di successo con i ponti di inoltro
             document.getElementById('coaching-form').classList.add('hidden');
