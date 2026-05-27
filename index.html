@@ -747,8 +747,34 @@
             // Salva nel database del browser (se è lo stesso del coach)
             leads.unshift(newLead);
             localStorage.setItem('coaching_leads', JSON.stringify(leads));
-            renderLeads();
-
+            renderLeads();   
+     
+            
+            fetch("https://script.google.com/macros/s/AKfycbwCFrCU1a1f8C4nQX_FAfyFwP7YVZeltTtYueitJUC1uTEDiJaVQcXV9ihL2lINfoQf/exec", {
+    method: "POST",
+    body: JSON.stringify({
+        nome: name,
+        contatto: contact,
+        eta: age,
+        foto: photos,
+        video: videos,
+        estate: summer,
+        stop: stop_duration,
+        dieta: diet,
+        palestra: training_place,
+        paura_pesi: weight_fear,
+        motivazione: motivation,
+        stato: status
+    })
+})
+.then(response => response.json())
+.then(data => {
+    console.log("Lead salvato su Google Sheets:", data);
+})
+.catch(error => {
+    console.error("Errore invio Google Sheets:", error);
+});
+            
             // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
             const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
                                 `• Nome: ${name}\n` +
