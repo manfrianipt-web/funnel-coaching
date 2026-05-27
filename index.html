@@ -1032,5 +1032,52 @@ Firma Coach: _____________________  Firma Cliente: _____________________`;
             alert("Contratto copiato negli appunti! Ora puoi incollarlo su un file Word o inviarlo via email.");
         }
     </script>
+        // Caricamento impostazioni (Email e WhatsApp salvati)
+        const settings = {
+            email: "manfrianipt@gmail.com", // Modifica con la tua email
+            whatsapp: "3932899553"      // Modifica con il tuo numero
+        };
+
+        function saveSettings() {
+            settings.email = document.getElementById('setting-email').value;
+            settings.whatsapp = document.getElementById('setting-whatsapp').value;
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Recupera i valori
+            const name = document.getElementById('form-name').value;
+            const contact = document.getElementById('form-contact').value;
+            const age = document.querySelector('input[name="form-age"]:checked').value;
+            const photos = document.querySelector('input[name="form-photos"]:checked').value;
+            const videos = document.querySelector('input[name="form-videos"]:checked').value;
+            const summer = document.getElementById('form-summer').value;
+            const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop";
+            const diet = document.getElementById('form-diet').value;
+            const training_place = document.querySelector('input[name="form-training-place"]:checked').value;
+            const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked').value;
+            const motivation = document.getElementById('form-motivation').value;
+
+            // Crea il testo
+            const textSummary = `CANDIDATURA: ${name}%0A%0A` +
+                                `• Contatto: ${contact}%0A` +
+                                `• Età: ${age}%0A` +
+                                `• Consenso Foto: ${photos}%0A` +
+                                `• Consenso Video: ${videos}%0A` +
+                                `• Luogo: ${training_place}%0A` +
+                                `• Vacanze: ${summer} (${stop_duration})%0A` +
+                                `• Dieta: ${diet}%0A` +
+                                `• Paura Pesi: ${weight_fear}%0A` +
+                                `• Motivazione: ${motivation}`;
+
+            // Collega i bottoni
+            document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${settings.whatsapp}?text=${textSummary}`;
+            document.getElementById('btn-submit-email').href = `mailto:${settings.email}?subject=Candidatura: ${name}&body=${textSummary.replace(/%0A/g, '\n')}`;
+
+            // Mostra schermata successo
+            document.getElementById('coaching-form').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+        }
 </body>
 </html>
