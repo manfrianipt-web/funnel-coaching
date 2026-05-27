@@ -2,23 +2,915 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Candidatura Recomposition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selezioni Recomposition Program</title>
+    <!-- Tailwind CSS per lo styling premium -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts per un look sportivo, moderno e leggibile -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Nascondi scrollbar per elementi di tracciamento mantenendo funzionalità */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Stato iniziale: Nasconde l'interfaccia coach per impostazione predefinita */
+        body.client-only #main-header,
+        body.client-only #sidebar-instructions,
+        body.client-only #tab-form,
+        body.client-only #tab-crm,
+        body.client-only #tab-contracts {
+            display: none !important;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 p-6 text-white">
-    <div class="max-w-xl mx-auto bg-slate-900 p-8 rounded-2xl">
-        <h1 class="text-2xl font-bold mb-6">Candidatura Recomposition</h1>
+<body class="text-slate-100 min-h-screen flex flex-col client-only" id="app-body">
+
+    <!-- TOP NAVIGATION BAR (Visibile SOLO al Coach loggato) -->
+    <header id="main-header" class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                    <i class="fa-solid fa-dumbbell text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl leading-tight tracking-tight">Coach Portal <span class="text-emerald-400">Recomposition</span></h1>
+                    <p class="text-xs text-slate-400">Sistema di Selezione & CRM Candidature (Area Riservata)</p>
+                </div>
+            </div>
+            
+            <!-- MENU DI NAVIGAZIONE COACH -->
+            <nav class="flex space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('form')" id="tab-form" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-emerald-500 text-slate-950">
+                    <i class="fa-solid fa-wpforms mr-1.5"></i> 1. Il Questionario
+                </button>
+                <button onclick="switchTab('crm')" id="tab-crm" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-users-viewfinder mr-1.5"></i> 2. Candidature <span id="badge-count" class="ml-1 px-1.5 py-0.5 text-xs bg-emerald-500/20 text-emerald-400 rounded-full font-bold font-mono">2</span>
+                </button>
+                <button onclick="switchTab('contracts')" id="tab-contracts" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-file-contract mr-1.5"></i> 3. Generatore Contratti
+                </button>
+                <button onclick="logoutCoach()" class="px-3 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 transition-all rounded-lg ml-2">
+                    <i class="fa-solid fa-lock"></i> Esci
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN APP WRAPPER -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
         
-        <form action="mailto:tua-email@esempio.com" method="POST" enctype="text/plain" class="space-y-4">
+        <!-- ==============================================
+             TAB 1: FORM DI CANDIDATURA (ANTEPRIMA EDITABILE)
+             ============================================== -->
+        <section id="section-form" class="tab-content block">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Spiegazione / Istruzioni di Setup (Visibile solo al Coach) -->
+                <div id="sidebar-instructions" class="lg:col-span-1 space-y-6">
+                    
+                    <!-- Configurazione Canali di Ricezione -->
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800/80 space-y-4">
+                        <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 font-bold text-xs uppercase rounded-lg tracking-wider border border-emerald-500/20">Configurazione Ricezione</span>
+                        <h2 class="text-lg font-bold text-white">Dove ricevi le risposte?</h2>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Quando la cliente compila il modulo dal suo telefono, vedrà una schermata di successo con i pulsanti per inviarti i suoi dati tramite questi canali.
+                        </p>
+                        <div class="space-y-3 pt-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tua Email Ricezione</label>
+                                <input type="email" id="setting-email" onchange="saveSettings()" value="info@tuocoaching.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tuo Numero WhatsApp (con prefisso, es. 39345...)</label>
+                                <input type="text" id="setting-whatsapp" onchange="saveSettings()" value="393456789012" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informazioni Gestione Link -->
+                    <div class="bg-gradient-to-br from-emerald-950/20 to-slate-900/50 p-6 rounded-2xl border border-emerald-500/15 space-y-4">
+                        <span class="px-2.5 py-1 bg-cyan-500/10 text-cyan-400 font-bold text-xs uppercase rounded-lg tracking-wider border border-cyan-500/20">Sicurezza Attiva</span>
+                        <h3 class="text-md font-bold text-white">Pronto per Instagram</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Questo file è configurato in modalità **sicurezza predefinita**. Chiunque apra il link vedrà solo il questionario. Per accedere a questa dashboard di amministrazione ti basterà fare clic sul link "Area Riservata" nel piè di pagina del modulo ed inserire la tua password.
+                        </p>
+                        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">La tua password di sblocco:</span>
+                            <code class="text-emerald-400 font-mono text-sm block font-bold">coach2026</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modulo Interattivo (Prende tutte e 3 le colonne per il cliente) -->
+                <div id="form-container-col" class="lg:col-span-3">
+                    
+                    <!-- Schermata di Successo / Invio Dati (Inizialmente nascosta) -->
+                    <div id="success-screen" class="hidden bg-slate-900 rounded-3xl border border-slate-800 p-8 sm:p-12 text-center space-y-6">
+                        <div class="w-20 h-20 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 rounded-full flex items-center justify-center mx-auto text-4xl animate-bounce">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h2 class="text-3xl font-bold text-white">Candidatura Registrata!</h2>
+                            <p class="text-slate-400 text-sm max-w-md mx-auto">
+                                Complimenti, le tue risposte sono state elaborate. Per completare ufficialmente l'invio e trasmettere la tua candidatura direttamente al Coach, seleziona una delle opzioni qui sotto:
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto pt-4">
+                            <!-- Pulsante WhatsApp -->
+                            <a id="btn-submit-whatsapp" href="#" target="_blank" class="p-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-2xl transition-all shadow-lg flex flex-col items-center justify-center gap-2 text-center">
+                                <i class="fa-brands fa-whatsapp text-3xl"></i>
+                                <span>Invia su WhatsApp</span>
+                                <span class="text-[10px] font-normal opacity-85">Consigliato, risposta rapida</span>
+                            </a>
+                            
+                            <!-- Pulsante Mail -->
+                            <a id="btn-submit-email" href="#" class="p-4 bg-slate-950 hover:bg-slate-800 text-emerald-400 font-bold rounded-2xl border border-slate-800 transition-all flex flex-col items-center justify-center gap-2 text-center">
+                                <i class="fa-solid fa-envelope text-3xl"></i>
+                                <span>Invia tramite Email</span>
+                                <span class="text-[10px] font-normal text-slate-400">Invia riepilogo via posta</span>
+                            </a>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-slate-800 max-w-md mx-auto">
+                            <p class="text-[10px] text-slate-500">
+                                Una volta effettuato l'invio, il Coach valuterà il tuo profilo entro 48 ore lavorative. In caso di esito positivo sarai ricontattata per iniziare il percorso.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Il Form Vero e Proprio -->
+                    <form id="coaching-form" onsubmit="handleFormSubmit(event)" class="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+                        
+                        <!-- Banner di Copertina del Modulo -->
+                        <div class="relative bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 p-8 sm:p-10 border-b border-slate-800 overflow-hidden">
+                            <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative z-10 space-y-2">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-400/10 text-emerald-400 font-bold text-xs uppercase rounded-full border border-emerald-400/20 tracking-wider">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Candidature Aperte
+                                </span>
+                                <h2 class="text-3xl font-extrabold text-white tracking-tight">Project Body Recomposition</h2>
+                                <p class="text-slate-400 text-sm max-w-xl leading-relaxed">
+                                    Compila attentamente questo modulo se hai tra i 20 e i 35 anni e desideri essere una delle 3 donne selezionate per un percorso di ricomposizione corporea gratuito di 3-6 mesi.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Campi del Modulo -->
+                        <div class="p-8 sm:p-10 space-y-8">
+                            
+                            <!-- SEZIONE 1: DATI PERSONALI -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">1</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Dati Anagrafici & Contatti</h3>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nome e Cognome *</label>
+                                        <input type="text" id="form-name" required placeholder="Es. Giulia Rossi" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-200">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Contatto Instagram (o Mail) *</label>
+                                        <input type="text" id="form-contact" required placeholder="@username o email" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-200">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Qual è la tua età? *</label>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-age" value="under20" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-sm font-medium text-slate-300">Meno di 20 anni</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-age" value="target" checked class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-sm font-medium text-slate-300">Tra 20 e 35 anni</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-age" value="over35" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-sm font-medium text-slate-300">Più di 35 anni</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 2: ACCETTAZIONE VINCOLI (FOTO & VIDEO) -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">2</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Requisiti e Consensi Obbligatori</h3>
+                                </div>
+                                
+                                <!-- Consenso Foto -->
+                                <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                                    <p class="text-sm font-medium text-slate-200 leading-relaxed">
+                                        Il percorso è gratuito in cambio di materiale per mostrare i progressi. Sei disposta ad inviare foto di controllo (Prima/Dopo e check intermedi) in abbigliamento sportivo o bikini, sapendo che saranno usate per finalità promozionali (anche oscurando il volto)? *
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-3">
+                                        <label class="flex-1 flex items-center gap-3 p-3 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-photos" value="yes" checked class="w-4 h-4 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, accetto (con volto protetto)</span>
+                                        </label>
+                                        <label class="flex-1 flex items-center gap-3 p-3 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-photos" value="no" class="w-4 h-4 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">No, non accetto l'uso delle foto</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Consenso Video -->
+                                <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                                    <p class="text-sm font-medium text-slate-200 leading-relaxed">
+                                        Sei disposta ad inviarmi ogni settimana/ogni 2 settimane brevi registrazioni video di come esegui gli esercizi? Questo passaggio è fondamentale affinché io possa analizzare ed ottimizzare la tua tecnica di esecuzione a distanza. *
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-3">
+                                        <label class="flex-1 flex items-center gap-3 p-3 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-videos" value="yes" checked class="w-4 h-4 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, registrerò parte dei miei allenamenti</span>
+                                        </label>
+                                        <label class="flex-1 flex items-center gap-3 p-3 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-videos" value="no" class="w-4 h-4 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">No, non voglio fare registrazioni</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 3: COSTANZA E GESTIONE ESTATE -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">3</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Gestione Stagione Estiva</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Quest'estate in vacanza avrai modo di allenarti (anche a corpo libero/elastici)? *</label>
+                                        <select id="form-summer" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 transition-all text-slate-200">
+                                            <option value="yes">Sì, posso organizzarmi ovunque</option>
+                                            <option value="no">No, non potrò allenarmi in vacanza</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Se andrai in ferie e NON potrai allenarti, per quanto tempo prevedi lo stop?</label>
+                                        <input type="text" id="form-stop-duration" placeholder="Es. Nessuno stop / Circa 1 settimana" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 transition-all text-slate-200">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 4: PROGRAMMA ALIMENTARE PERSONALIZZATO -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">4</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Programma Alimentare Personalizzato</h3>
+                                </div>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sei disposta a seguire con rigore un piano alimentare personalizzato? *</label>
+                                        <select id="form-diet" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 transition-all text-slate-200">
+                                            <option value="yes">Sì, seguirò le linee guida con precisione</option>
+                                            <option value="no">No, ho difficoltà a seguire piani alimentari fissi</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 5: LUOGO DI ALLENAMENTO & ATTREZZATURA -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">5</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Luogo di Allenamento & Attrezzatura</h3>
+                                </div>
+                                <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                                    <p class="text-sm font-medium text-slate-200 leading-relaxed">
+                                        Disponi di un abbonamento attivo in palestra o di una Home Gym attrezzata (es. bilancieri, manubri di vario taglio, rack, carichi modulabili)? *
+                                    </p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-training-place" value="gym" checked class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, ho un abbonamento attivo in palestra</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-training-place" value="homegym" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, ho una Home Gym attrezzata a casa</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-training-place" value="willing" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">No, ma sono disposta ad iscrivermi subito</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-training-place" value="no-equip" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">No, posso allenarmi solo a casa senza attrezzi</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 6: RAPPORTO CON L'ALLENAMENTO E I PESI -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">6</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Rapporto con l'Allenamento e i Pesi</h3>
+                                </div>
+                                <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                                    <p class="text-sm font-medium text-slate-200 leading-relaxed">
+                                        Hai timori o preoccupazioni riguardo all'uso dei pesi (anche impegnativi) in palestra? (Es. paura di "ingrossare" troppo, perdere femminilità o infortunarti) *
+                                    </p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-weight-fear" value="no" checked class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">No, voglio spingere e diventare forte</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-weight-fear" value="yes-bulky" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, temo di diventare "troppo muscolosa"</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-weight-fear" value="yes-injury" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Sì, temo di farmi male / eseguire male</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition-all">
+                                            <input type="radio" name="form-weight-fear" value="beginner" class="w-4 h-4 text-emerald-500 focus:ring-0 accent-emerald-500">
+                                            <span class="text-xs font-semibold text-slate-300">Nessuna paura, ma sono principiante totale</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEZIONE 7: MOTIVAZIONE -->
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-emerald-400 border-b border-slate-800/80 pb-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-400/10 text-xs flex items-center justify-center font-bold">7</span>
+                                    <h3 class="text-md font-bold uppercase tracking-wider">Motivazione & Storico</h3>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Perché dovrei scegliere proprio te tra tutte le candidate? Descrivimi i tuoi obiettivi. *</label>
+                                    <textarea id="form-motivation" required rows="4" placeholder="Parlami di te, della tua storia con l'allenamento e di cosa ti frena dal raggiungere la tua forma fisica desiderata..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 transition-all text-slate-200"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Bottone Invio -->
+                            <div class="pt-4">
+                                <button type="submit" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-2xl transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> Invia Candidatura Ufficiale
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- ==============================================
+             TAB 2: CRM CANDIDATURE RICEVUTE (GESTIONE CONTROLLI)
+             ============================================== -->
+        <section id="section-crm" class="tab-content hidden">
+            <div class="space-y-6">
+                
+                <!-- Statistiche veloci in alto -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="p-5 bg-slate-900 rounded-2xl border border-slate-800/80">
+                        <div class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Candidature Totali</div>
+                        <div id="stats-total" class="text-3xl font-bold text-white mt-1">2</div>
+                    </div>
+                    <div class="p-5 bg-slate-900 rounded-2xl border border-slate-800/80">
+                        <div class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Profili Idonei</div>
+                        <div id="stats-eligible" class="text-3xl font-bold text-emerald-400 mt-1">2</div>
+                    </div>
+                    <div class="p-5 bg-slate-900 rounded-2xl border border-slate-800/80">
+                        <div class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Esclusioni Automatiche</div>
+                        <div id="stats-excluded" class="text-3xl font-bold text-rose-500 mt-1">0</div>
+                    </div>
+                    <div class="p-5 bg-slate-900 rounded-2xl border border-slate-800/80 flex items-center justify-center">
+                        <button onclick="clearDatabase()" class="px-4 py-2 bg-slate-950 text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs font-semibold transition-all">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Cancella Database
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista delle Candidature -->
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-white">Database Candidature (Locali)</h2>
+                        <span class="text-xs text-slate-400">Le candidature registrate appaiono istantaneamente qui</span>
+                    </div>
+
+                    <!-- Tabella Leads -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                    <th class="p-4">Candidata</th>
+                                    <th class="p-4">Età</th>
+                                    <th class="p-4">Foto / Video Consenso</th>
+                                    <th class="p-4">Vacanze Estive / Stop</th>
+                                    <th class="p-4">Esito Preliminare</th>
+                                    <th class="p-4 text-right">Dettagli</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crm-leads-list" class="divide-y divide-slate-800/60">
+                                <!-- Generato dinamicamente via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================================
+             TAB 3: GENERATORE CONTRATTI DINAMICI
+             ============================================== -->
+        <section id="section-contracts" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Compilatore Parametri Contratto -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-5">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-emerald-400"></i> Dati Contratto
+                        </h2>
+                        <p class="text-xs text-slate-400">Inserisci i parametri del tuo percorso per aggiornare istantaneamente la bozza legale a destra.</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tuo Nome / Studio Coach *</label>
+                                <input type="text" id="contract-input-coach" oninput="updateContractText()" value="Marco Rossi S.S.D." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Valore Commerciale Percorso (€) *</label>
+                                <input type="number" id="contract-input-value" oninput="updateContractText()" value="600" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Importo Deposito Cauzionale (€) *</label>
+                                <input type="number" id="contract-input-deposit" oninput="updateContractText()" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Durata Percorso (Mesi) *</label>
+                                <select id="contract-input-months" onchange="updateContractText()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200">
+                                    <option value="3">3 Mesi</option>
+                                    <option value="6" selected>6 Mesi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selezione Opzione -->
+                    <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2">
+                        <button onclick="selectContractStrategy('A')" id="btn-strategy-a" class="w-full text-left p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex items-center gap-3 transition-all">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center"><i class="fa-solid fa-piggy-bank"></i></span>
+                            <div>
+                                <span class="block text-xs text-slate-400 font-bold uppercase">Consigliata</span>
+                                <strong class="text-sm text-slate-100">Opzione A (Cauzione)</strong>
+                            </div>
+                        </button>
+                        <button onclick="selectContractStrategy('B')" id="btn-strategy-b" class="w-full text-left p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 flex items-center gap-3 transition-all">
+                            <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-ban"></i></span>
+                            <div>
+                                <span class="block text-xs text-slate-400 font-bold uppercase">Senza Soldi</span>
+                                <strong class="text-sm text-slate-300">Opzione B (Recesso Immediato)</strong>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Visualizzatore Contratto Rigenerato -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                            <h3 id="display-contract-title" class="text-lg font-bold text-white">Opzione A: Accordo d'Impegno con Deposito Cauzionale</h3>
+                            <button onclick="copyContractToClipboard()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                                <i class="fa-solid fa-copy"></i> Copia Testo
+                            </button>
+                        </div>
+                        
+                        <!-- Box Testo Contratto -->
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 max-h-[500px] overflow-y-auto">
+                            <pre id="display-contract-body" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed font-sans">
+                                <!-- Testo iniettato dinamicamente -->
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER PUBBLICO CON ACCESSO SEGRETO COACH -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-slate-600 text-xs space-y-2">
+        <p>© 2026 Recomposition Program Coaching. Tutti i diritti riservati.</p>
+        <div>
+            <!-- Link di sblocco quasi invisibile per il coach -->
+            <button onclick="requestCoachLogin()" class="text-slate-800 hover:text-emerald-500/50 transition-all text-[10px] uppercase font-bold tracking-wider">
+                <i class="fa-solid fa-shield-halved mr-1"></i> Area Riservata Coach
+            </button>
+        </div>
+    </footer>
+
+    <!-- DETTAGLI MODALE (PER VISIONARE UNA CANDIDATURA) -->
+    <div id="lead-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
             
-            <label class="block text-sm">Nome e Cognome</label>
-            <input type="text" name="Nome" required class="w-full p-2 bg-slate-800 rounded">
-            
-            <label class="block text-sm">Motivazione</label>
-            <textarea name="Motivazione" class="w-full p-2 bg-slate-800 rounded"></textarea>
-            
-            <button type="submit" class="w-full bg-emerald-500 p-3 rounded font-bold">Invia via Email</button>
-        </form>
+            <div class="space-y-2">
+                <span id="modal-status" class="px-2.5 py-0.5 text-xs font-bold uppercase rounded border">IDONEA</span>
+                <h3 id="modal-name" class="text-2xl font-bold text-white">Nome Cognome</h3>
+                <p id="modal-contact" class="text-sm text-emerald-400">@contatto</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Filtro Età</span>
+                    <strong id="modal-age" class="text-slate-300">Tra i 20 e i 35 anni</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Consenso Foto</span>
+                    <strong id="modal-photos" class="text-slate-300">Sì</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Consenso Video Tecnica</span>
+                    <strong id="modal-videos" class="text-slate-300">Sì</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Allenamento in Vacanza</span>
+                    <strong id="modal-summer" class="text-slate-300">Sì, ovunque</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Rigore Alimentare</span>
+                    <strong id="modal-diet" class="text-slate-300">Sì</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Luogo e Attrezzatura</span>
+                    <strong id="modal-training-place" class="text-slate-300">Palestra</strong>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 uppercase tracking-wider mb-1">Timore dei Pesi</span>
+                    <strong id="modal-weight-fear" class="text-slate-300">No, vuole spingere</strong>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="block text-xs text-slate-400 font-bold uppercase tracking-wider">Durata dell'eventuale stop estivo:</span>
+                <div id="modal-stop" class="p-3 bg-slate-950/50 rounded-lg border border-slate-800 text-sm text-slate-300 italic"></div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="block text-xs text-slate-400 font-bold uppercase tracking-wider">Motivazione ed Esperienze Passate:</span>
+                <div id="modal-motivation" class="p-4 bg-slate-950/50 rounded-xl border border-slate-800 text-sm text-slate-300 leading-relaxed whitespace-pre-wrap"></div>
+            </div>
+        </div>
     </div>
+
+    <!-- JAVASCRIPT: LOGICHE E PERSISTENZA LOCAL STORAGE -->
+    <script>
+        // Database locale iniziale (se vuoto) per fini illustrativi
+        const defaultLeads = [
+            {
+                id: 1,
+                name: "Giulia Rossi",
+                contact: "@giuliaglows",
+                age: "target", // Tra i 20 e i 35 anni
+                photos: "yes",
+                videos: "yes",
+                summer: "yes",
+                stop_duration: "Nessuno stop, porto gli elastici in Grecia",
+                diet: "yes",
+                training_place: "gym",
+                weight_fear: "no",
+                motivation: "Mi alleno da 2 anni ma non vedo mai veri cambiamenti di composizione corporea. Accumulo sempre sui fianchi. Sono disposta a fare qualsiasi video e controllo fotografico pur di avere una guida scientifica.",
+                date: "27 Mag 2026",
+                status: "eligible"
+            },
+            {
+                id: 2,
+                name: "Sofia Bianchi",
+                contact: "sofia.bianchi99@gmail.com",
+                age: "target",
+                photos: "yes",
+                videos: "yes",
+                summer: "no",
+                stop_duration: "Prevedo stop di 2 settimane ad agosto",
+                diet: "yes",
+                training_place: "homegym",
+                weight_fear: "yes-bulky",
+                motivation: "Vorrei iniziare un percorso serio per tonificare la zona glutei e gambe. Non ho mai fatto video dei miei esercizi, ma capisco che a distanza è essenziale per non farsi male. Ci sto al 100%!",
+                date: "26 Mag 2026",
+                status: "eligible"
+            }
+        ];
+
+        // Carica dati dal Local Storage o carica quelli predefiniti
+        let leads = JSON.parse(localStorage.getItem('coaching_leads')) || [];
+        if (leads.length === 0) {
+            leads = defaultLeads;
+            localStorage.setItem('coaching_leads', JSON.stringify(leads));
+        }
+
+        // Carica impostazioni di ricezione email / whatsapp
+        let settings = JSON.parse(localStorage.getItem('coaching_settings')) || {
+            email: "info@tuocoaching.com",
+            whatsapp: "393456789012"
+        };
+
+        // Variabile di stato per la strategia contrattuale attiva
+        let activeStrategy = 'A';
+
+        // Avvio iniziale
+        window.onload = function() {
+            // Applica impostazioni caricate
+            document.getElementById('setting-email').value = settings.email;
+            document.getElementById('setting-whatsapp').value = settings.whatsapp;
+
+            // Di default il file si apre in modalità "client-only" (sicura)
+            // Se in precedenza il coach ha effettuato l'accesso in questa sessione, ripristina la sessione
+            if (sessionStorage.getItem('coach_logged_in') === 'true') {
+                unlockCoachDashboard();
+            }
+
+            renderLeads();
+            updateContractText();
+        };
+
+        // GESTORE ACCESSO SICURO TRAMITE PASSWORD
+        function requestCoachLogin() {
+            const password = prompt("Inserisci la password per accedere al Pannello Coach:");
+            if (password === "coach2026") {
+                sessionStorage.setItem('coach_logged_in', 'true');
+                unlockCoachDashboard();
+                alert("Accesso effettuato! Sblocco del Pannello di Controllo Coach eseguito con successo.");
+            } else if (password !== null) {
+                alert("Password errata. L'interfaccia protetta rimane bloccata.");
+            }
+        }
+
+        function unlockCoachDashboard() {
+            document.getElementById('app-body').classList.remove('client-only');
+            const formCol = document.getElementById('form-container-col');
+            if (formCol) {
+                formCol.classList.remove('lg:col-span-3');
+                formCol.classList.add('lg:col-span-2');
+            }
+        }
+
+        function logoutCoach() {
+            sessionStorage.removeItem('coach_logged_in');
+            document.getElementById('app-body').classList.add('client-only');
+            const formCol = document.getElementById('form-container-col');
+            if (formCol) {
+                formCol.classList.remove('lg:col-span-2');
+                formCol.classList.add('lg:col-span-3');
+            }
+            switchTab('form');
+            alert("Uscita effettuata. Il file è tornato in modalità provvisoria per la cliente.");
+        }
+
+        // Salva le impostazioni di ricezione inserite
+        function saveSettings() {
+            settings.email = document.getElementById('setting-email').value;
+            settings.whatsapp = document.getElementById('setting-whatsapp').value;
+            localStorage.setItem('coaching_settings', JSON.stringify(settings));
+        }
+
+        // Cambia schermata
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            document.getElementById('section-' + tabName).classList.add('block');
+            document.getElementById('section-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+            });
+            document.getElementById('tab-' + tabName).className = "tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-emerald-500 text-slate-950";
+        }
+
+        // Gestore del salvataggio del modulo di candidatura
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('form-name').value;
+            const contact = document.getElementById('form-contact').value;
+            const age = document.querySelector('input[name="form-age"]:checked').value;
+            const photos = document.querySelector('input[name="form-photos"]:checked').value;
+            const videos = document.querySelector('input[name="form-videos"]:checked').value;
+            const summer = document.getElementById('form-summer').value;
+            const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop specificato";
+            const diet = document.getElementById('form-diet').value;
+            const training_place = document.querySelector('input[name="form-training-place"]:checked').value;
+            const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked').value;
+            const motivation = document.getElementById('form-motivation').value;
+
+            // Logica del filtro automatico di screening
+            let status = "eligible";
+            if (age !== "target" || photos === "no" || videos === "no" || training_place === "no-equip") {
+                status = "excluded";
+            }
+
+            const newLead = {
+                id: Date.now(),
+                name,
+                contact,
+                age,
+                photos,
+                videos,
+                summer,
+                stop_duration,
+                diet,
+                training_place,
+                weight_fear,
+                motivation,
+                date: new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }),
+                status
+            };
+
+            // Salva nel database del browser (se è lo stesso del coach)
+            leads.unshift(newLead);
+            localStorage.setItem('coaching_leads', JSON.stringify(leads));
+            renderLeads();
+
+            // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
+            const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
+                                `• Nome: ${name}\n` +
+                                `• Contatto: ${contact}\n` +
+                                `• Età: ${age === 'target' ? '20-35 anni' : (age === 'under20' ? 'Sotto i 20' : 'Sopra i 35')}\n` +
+                                `• Consenso Foto: ${photos === 'yes' ? 'SI' : 'NO'}\n` +
+                                `• Consenso Video Tecnica: ${videos === 'yes' ? 'SI' : 'NO'}\n` +
+                                `• Attrezzatura: ${training_place === 'gym' ? 'Palestra' : (training_place === 'homegym' ? 'Home Gym' : (training_place === 'willing' ? 'Pronta a Iscriversi' : 'No attrezzi'))}\n` +
+                                `• Allena in Vacanza: ${summer === 'yes' ? 'SI' : 'NO'} (${stop_duration})\n` +
+                                `• Segue Alimentazione: ${diet === 'yes' ? 'SI' : 'NO'}\n` +
+                                `• Paura Pesi: ${weight_fear === 'no' ? 'No, vuole spingere' : (weight_fear === 'beginner' ? 'Principiante totale' : 'Sì, preoccupata')}\n` +
+                                `• Motivazione: ${motivation}`;
+
+            // 1. Configura link WhatsApp
+            const waPhone = settings.whatsapp;
+            const waEncodedText = encodeURIComponent(textSummary);
+            document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${waPhone}?text=${waEncodedText}`;
+
+            // 2. Configura link Email
+            const emailReceiver = settings.email;
+            const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
+            const emailBody = encodeURIComponent(textSummary);
+            document.getElementById('btn-submit-email').href = `mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}`;
+
+            // Nasconde il modulo e mostra la schermata di successo con i ponti di inoltro
+            document.getElementById('coaching-form').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+            
+            // Scorri in cima alla pagina per mostrare il successo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Renderizza la lista dei lead
+        function renderLeads() {
+            const list = document.getElementById('crm-leads-list');
+            if(!list) return;
+            list.innerHTML = '';
+
+            let total = leads.length;
+            let eligible = 0;
+            let excluded = 0;
+
+            leads.forEach(lead => {
+                if (lead.status === 'eligible') eligible++;
+                else excluded++;
+
+                const row = document.createElement('tr');
+                row.className = "border-b border-slate-800/50 hover:bg-slate-900/30 transition-all";
+                
+                const statusBadge = lead.status === 'eligible' 
+                    ? `<span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5 w-fit"><i class="fa-solid fa-circle-check text-[10px]"></i> IDONEA</span>`
+                    : `<span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1.5 w-fit"><i class="fa-solid fa-circle-xmark text-[10px]"></i> ESCLUSA</span>`;
+
+                const ageText = lead.age === 'target' ? '20-35 anni' : (lead.age === 'under20' ? 'Sotto 20' : 'Sopra 35');
+                const photoCheck = lead.photos === 'yes' ? '<span class="text-emerald-400"><i class="fa-solid fa-image"></i> Sì</span>' : '<span class="text-rose-400"><i class="fa-solid fa-image-slash"></i> No</span>';
+                const videoCheck = lead.videos === 'yes' ? '<span class="text-emerald-400 ml-3"><i class="fa-solid fa-video"></i> Sì</span>' : '<span class="text-rose-400 ml-3"><i class="fa-solid fa-video-slash"></i> No</span>';
+                const summerText = lead.summer === 'yes' ? '<span class="text-emerald-400"><i class="fa-solid fa-umbrella-beach"></i> Sì</span>' : '<span class="text-amber-400"><i class="fa-solid fa-ban"></i> No</span>';
+
+                // Badge logistico allenamento
+                let placeBadge = "";
+                if (lead.training_place === "gym") {
+                    placeBadge = `<span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/15">Palestra</span>`;
+                } else if (lead.training_place === "homegym") {
+                    placeBadge = `<span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-purple-500/10 text-purple-400 border border-purple-500/15">Home Gym</span>`;
+                } else if (lead.training_place === "willing") {
+                    placeBadge = `<span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/15">Iscrivenda</span>`;
+                } else {
+                    placeBadge = `<span class="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-rose-500/10 text-rose-400 border border-rose-500/15">No Attrezzi</span>`;
+                }
+
+                row.innerHTML = `
+                    <td class="p-4">
+                        <div class="flex items-center gap-1">
+                            <span class="font-bold text-slate-100">${lead.name}</span>
+                            ${placeBadge}
+                        </div>
+                        <div class="text-xs text-emerald-400">${lead.contact}</div>
+                    </td>
+                    <td class="p-4 text-sm text-slate-300 font-medium">${ageText}</td>
+                    <td class="p-4 text-sm">${photoCheck} ${videoCheck}</td>
+                    <td class="p-4">
+                        <div class="text-sm">${summerText}</div>
+                        <div class="text-xs text-slate-500 max-w-[150px] truncate" title="${lead.stop_duration}">${lead.stop_duration}</div>
+                    </td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="viewLead(${lead.id})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg transition-all">
+                            <i class="fa-solid fa-magnifying-glass"></i> Dettagli
+                        </button>
+                    </td>
+                `;
+                list.appendChild(row);
+            });
+
+            // Aggiorna contatori in alto
+            document.getElementById('stats-total').innerText = total;
+            document.getElementById('stats-eligible').innerText = eligible;
+            document.getElementById('stats-excluded').innerText = excluded;
+            document.getElementById('badge-count').innerText = total;
+        }
+
+        // Visione Dettaglio Lead Modale
+        function viewLead(id) {
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+
+            document.getElementById('modal-name').innerText = lead.name;
+            document.getElementById('modal-contact').innerText = lead.contact;
+            document.getElementById('modal-age').innerText = lead.age === 'target' ? 'Fascia di età idonea (20-35 anni)' : (lead.age === 'under20' ? 'Non idonea (Minore di 20 anni)' : 'Non idonea (Maggiore di 35 anni)');
+            document.getElementById('modal-photos').innerText = lead.photos === 'yes' ? 'Accettato con consenso di divulgação' : 'Rifiutato';
+            document.getElementById('modal-videos').innerText = lead.videos === 'yes' ? 'Disponibile alle video-analisi tecniche' : 'Rifiutato';
+            document.getElementById('modal-summer').innerText = lead.summer === 'yes' ? 'Sì, possibilità di allenarsi ovunque' : 'No, vacanza totalmente inattiva';
+            document.getElementById('modal-diet').innerText = lead.diet === 'yes' ? 'Disponibile a seguire con rigore' : 'No, non disposta';
+            
+            // Gestione testo per luogo allenamento
+            let placeText = "Palestra";
+            if (lead.training_place === "homegym") {
+                placeText = "Home Gym attrezzata";
+            } else if (lead.training_place === "willing") {
+                placeText = "Nessuna, ma pronta ad iscriversi in palestra";
+            } else if (lead.training_place === "no-equip") {
+                placeText = "Solo a casa senza attrezzi (Causa esclusione)";
+            }
+            document.getElementById('modal-training-place').innerText = placeText;
+
+            // Gestione testo per paura dei pesi
+            let fearText = "No, desidera caricare ed essere forte";
+            if (lead.weight_fear === "yes-bulky") {
+                fearText = "Sì, ha paura di diventare \"troppo muscolosa/grossa\"";
+            } else if (lead.weight_fear === "yes-injury") {
+                fearText = "Sì, teme di farsi male o di sbagliare la tecnica";
+            } else if (lead.weight_fear === "beginner") {
+                fearText = "Nessuna paura, ma è una principiante assoluta";
+            }
+            document.getElementById('modal-weight-fear').innerText = fearText;
+
+            document.getElementById('modal-stop').innerText = lead.stop_duration;
+            document.getElementById('modal-motivation').innerText = lead.motivation;
+
+            const badge = document.getElementById('modal-status');
+            if (lead.status === 'eligible') {
+                badge.innerText = "Idonea";
+                badge.className = "px-2.5 py-0.5 text-xs font-bold uppercase rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/30 w-fit";
+            } else {
+                badge.innerText = "Esclusa Automaticamente";
+                badge.className = "px-2.5 py-0.5 text-xs font-bold uppercase rounded border bg-rose-500/10 text-rose-400 border-rose-500/30 w-fit";
+            }
+
+            document.getElementById('lead-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('lead-modal').classList.add('hidden');
+        }
+
+        // Svuota Database
+        function clearDatabase() {
+            if (confirm("Vuoi davvero svuotare tutte le candidature? Questa azione è irreversibile.")) {
+                leads = [];
+                localStorage.setItem('coaching_leads', JSON.stringify(leads));
+                renderLeads();
+            }
+    </script>
 </body>
 </html>
