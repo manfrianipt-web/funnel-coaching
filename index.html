@@ -756,6 +756,13 @@ fetch("https://script.google.com/macros/s/AKfycbwCFrCU1a1f8C4nQX_FAfyFwP7YVZeltT
     body: JSON.stringify({
         test: "FUNZIONA"
     })
+})
+.then(response => response.json())
+.then(data => {
+    console.log("Lead salvato:", data);
+})
+.catch(error => {
+    console.error("Errore:", error);
 });
             
             // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
