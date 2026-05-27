@@ -134,11 +134,19 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto pt-4">
                             <!-- Pulsante WhatsApp -->
-                            <a id="btn-submit-whatsapp" href="javascript:void(0)" class="p-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-2xl transition-all shadow-lg flex flex-col items-center justify-center gap-2 text-center">
+                            <a id="btn-submit-whatsapp" href="#" target="_blank" class="p-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-2xl transition-all shadow-lg flex flex-col items-center justify-center gap-2 text-center">
                                 <i class="fa-brands fa-whatsapp text-3xl"></i>
                                 <span>Invia su WhatsApp</span>
                                 <span class="text-[10px] font-normal opacity-85">Consigliato, risposta rapida</span>
                             </a>
+                            
+                            <!-- Pulsante Mail -->
+                            <a id="btn-submit-email" href="#" class="p-4 bg-slate-950 hover:bg-slate-800 text-emerald-400 font-bold rounded-2xl border border-slate-800 transition-all flex flex-col items-center justify-center gap-2 text-center">
+                                <i class="fa-solid fa-envelope text-3xl"></i>
+                                <span>Invia tramite Email</span>
+                                <span class="text-[10px] font-normal text-slate-400">Invia riepilogo via posta</span>
+                            </a>
+                        </div>
                         
                         <div class="pt-6 border-t border-slate-800 max-w-md mx-auto">
                             <p class="text-[10px] text-slate-500">
@@ -758,11 +766,12 @@
             const waPhone = settings.whatsapp;
             const waEncodedText = encodeURIComponent(textSummary);
             document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${waPhone}?text=${waEncodedText}`;
-            
-            // Assegniamo una funzione diretta al click del bottone
-            const emailBtn = document.getElementById('btn-submit-email');
-            emailBtn.setAttribute('onclick', `window.location.href='mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}'; return false;`);
-            emailBtn.href = "javascript:void(0)";
+
+            // 2. Configura link Email
+            const emailReceiver = settings.email;
+            const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
+            const emailBody = encodeURIComponent(textSummary);
+            document.getElementById('btn-submit-email').href = `mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}`;
 
             // Nasconde il modulo e mostra la schermata di successo con i ponti di inoltro
             document.getElementById('coaching-form').classList.add('hidden');
@@ -1021,8 +1030,8 @@ function handleFormSubmit(event) {
     const emailLink = `mailto:${emailCoach}?subject=Candidatura Body Recomposition&body=${encodedText}`;
 
     // 4. Assegniamo i link ai bottoni che hai già
-    document.getElementById('btn-submit-whatsapp').onclick = function() { window.location.href = waLink; };
-    document.getElementById('btn-submit-email').onclick = function() { window.location.href = emailLink; };
+    document.getElementById('btn-submit-whatsapp').href = waLink;
+    document.getElementById('btn-submit-email').href = emailLink;
 
     // 5. Nascondiamo il form e mostriamo la conferma
     document.getElementById('coaching-form').classList.add('hidden');
