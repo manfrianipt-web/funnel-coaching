@@ -715,17 +715,39 @@
             const photos = document.querySelector('input[name="form-photos"]:checked').value;
             const videos = document.querySelector('input[name="form-videos"]:checked').value;
             const summer = document.getElementById('form-summer').value;
-            const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop specificato";
+            const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop";
             const diet = document.getElementById('form-diet').value;
             const training_place = document.querySelector('input[name="form-training-place"]:checked').value;
             const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked').value;
             const motivation = document.getElementById('form-motivation').value;
 
-            // Logica del filtro automatico di screening
-            let status = "eligible";
-            if (age !== "target" || photos === "no" || videos === "no" || training_place === "no-equip") {
-                status = "excluded";
-            }
+            const textSummary = `CANDIDATURA: ${name}\n\n` +
+                                `• Contatto: ${contact}\n` +
+                                `• Età: ${age}\n` +
+                                `• Consenso Foto: ${photos}\n` +
+                                `• Consenso Video: ${videos}\n` +
+                                `• Luogo: ${training_place}\n` +
+                                `• Vacanze: ${summer} (${stop_duration})\n` +
+                                `• Dieta: ${diet}\n` +
+                                `• Paura Pesi: ${weight_fear}\n` +
+                                `• Motivazione: ${motivation}`;
+
+            const waPhone = settings.whatsapp;
+            const emailReceiver = settings.email;
+
+            // Aggiorniamo i bottoni per gestire l'invio senza aprire pagine vuote
+            document.getElementById('btn-submit-whatsapp').onclick = function() {
+                window.location.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(textSummary)}`;
+            };
+            
+            document.getElementById('btn-submit-email').onclick = function() {
+                window.location.href = `mailto:${emailReceiver}?subject=${encodeURIComponent('Candidatura: ' + name)}&body=${encodeURIComponent(textSummary)}`;
+            };
+
+            // Nascondiamo il form e mostriamo il successo
+            document.getElementById('coaching-form').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });}
 
             const newLead = {
                 id: Date.now(),
