@@ -767,13 +767,6 @@ fetch("https://script.google.com/macros/s/AKfycbyurYO4w24Tcdlq_Nr__ecJPuuirzP2d9
     weight_fear: weight_fear,
     motivation: motivation
 })
-})
-.then(response => response.json())
-.then(data => {
-    console.log("Lead salvato:", data);
-})
-.catch(error => {
-    console.error("Errore:", error);
 });
             
             // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
