@@ -139,14 +139,6 @@
                                 <span>Invia su WhatsApp</span>
                                 <span class="text-[10px] font-normal opacity-85">Consigliato, risposta rapida</span>
                             </a>
-                            
-                            <!-- Pulsante Mail -->
-                            <a id="btn-submit-email" href="javascript:void(0)" class="p-4 bg-slate-950 hover:bg-slate-800 text-emerald-400 font-bold rounded-2xl border border-slate-800 transition-all flex flex-col items-center justify-center gap-2 text-center">
-                                <i class="fa-solid fa-envelope text-3xl"></i>
-                                <span>Invia tramite Email</span>
-                                <span class="text-[10px] font-normal text-slate-400">Invia riepilogo via posta</span>
-                            </a>
-                        </div>
                         
                         <div class="pt-6 border-t border-slate-800 max-w-md mx-auto">
                             <p class="text-[10px] text-slate-500">
@@ -766,11 +758,6 @@
             const waPhone = settings.whatsapp;
             const waEncodedText = encodeURIComponent(textSummary);
             document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${waPhone}?text=${waEncodedText}`;
-
-            // 2. Configura invio Email (Metodo forzato)
-            const emailReceiver = settings.email;
-            const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
-            const emailBody = encodeURIComponent(textSummary);
             
             // Assegniamo una funzione diretta al click del bottone
             const emailBtn = document.getElementById('btn-submit-email');
