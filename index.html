@@ -911,6 +911,104 @@
                 localStorage.setItem('coaching_leads', JSON.stringify(leads));
                 renderLeads();
             }
+        }
+
+        // ==============================================
+        // GESTORE GENERATORE DI CONTRATTI
+        // ==============================================
+        function selectContractStrategy(strategy) {
+            activeStrategy = strategy;
+            
+            const btnA = document.getElementById('btn-strategy-a');
+            const btnB = document.getElementById('btn-strategy-b');
+            
+            if (strategy === 'A') {
+                btnA.className = "w-full text-left p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex items-center gap-3 transition-all";
+                btnB.className = "w-full text-left p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 flex items-center gap-3 transition-all";
+                document.getElementById('display-contract-title').innerText = "Opzione A: Accordo d'Impegno con Deposito Cauzionale";
+            } else {
+                btnA.className = "w-full text-left p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 flex items-center gap-3 transition-all";
+                btnB.className = "w-full text-left p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex items-center gap-3 transition-all";
+                document.getElementById('display-contract-title').innerText = "Opzione B: Accordo di Recesso Unilaterale Immediato";
+            }
+            updateContractText();
+        }
+
+        function updateContractText() {
+            const coach = document.getElementById('contract-input-coach').value || "[Tuo Nome/Studio]";
+            const value = document.getElementById('contract-input-value').value || "600";
+            const deposit = document.getElementById('contract-input-deposit').value || "100";
+            const months = document.getElementById('contract-input-months').value || "6";
+
+            let text = "";
+
+            if (activeStrategy === 'A') {
+                text = `ACCORDO DI ADESIONE AL PROGRAMMA "PROGETTO RICOMPOSIZIONE"
+
+Con la presente scrittura privata, tra:
+Il Coach: ${coach}
+e la Cliente: [Nome e Cognome della Candidata Selezionata]
+
+Si conviene e si stipula quanto segue:
+
+ART. 1 - OGGETTO DELL'ACCORDO
+Il Coach si impegna a fornire gratuitamente alla Cliente un programma personalizzato di allenamento e linee guida alimentari per la durata di ${months} mesi (Valore commerciale stimato dell'offerta di coaching: € ${value},00).
+
+ART. 2 - DEPOSITO CAUZIONALE DI IMPEGNO
+A garanzia della massima serietà dell'impegno e del profondo rispetto del lavoro del professionista, la Cliente versa in data odierna un deposito cauzionale infruttifero pari a € ${deposit},00.
+
+ART. 3 - CONDIZIONI DI RESTITUZIONE DEL DEPOSITO
+La somma di cui all'Art. 2 sarà INTERAMENTE RESTITUITA alla Cliente al termine dei ${months} mesi previsti, a condizione che la stessa rispetti rigorosamente i seguenti punti di collaborazione:
+1) Invio puntuale dei check-in bi-settimanali (comprendenti peso corporeo, report di allenamento compilato ed eventuali feedback richiesti).
+2) Invio del materiale fotografico di controllo (Prima/Dopo e check intermedi) nelle scadenze stabilite.
+3) Invio di brevi registrazioni video d'esecuzione degli esercizi principali per la correzione della tecnica a distanza.
+
+ART. 4 - INADEMPIENZA E TRATTENUTA DELLA PENALE
+In caso di abbandono ingiustificato del percorso da parte della Cliente, o qualora si verifichi il mancato invio dei check-in o del materiale descritto all'Art. 3 per due scadenze consecutive senza grave motivo, l'accordo si riterrà sciolto per inadempimento. Di conseguenza, il deposito cauzionale di € ${deposit},00 sarà definitivamente trattenuto dal Coach a titolo di penale risarcitoria per il tempo e il servizio erogati.
+
+Luogo: ______________ Data: ______________
+
+Firma Coach: _____________________  Firma Cliente: _____________________`;
+            } else {
+                text = `ACCORDO DI COOPERAZIONE E BORSA DI STUDIO SPORTIVA
+
+Con la presente scrittura privata, tra:
+Il Coach: ${coach}
+e la Cliente: [Nome e Cognome della Candidata Selezionata]
+
+Si conviene e si stipula quanto segue:
+
+ART. 1 - OGGETTO DELL'ACCORDO
+Il Coach offre alla Cliente una borsa di studio sportiva a copertura totale del percorso di coaching online della durata di ${months} mesi (del valore complessivo di € ${value},00). Nessuna spesa economica è a carico della Cliente, a patto del rigoroso adempimento degli obblighi descritti all'Art. 2.
+
+ART. 2 - DOVERI DI COLLABORAZIONE DELLA CLIENTE
+La totale gratuità del percorso è espressamente vincolata al rispetto dei seguenti obblighi operativi:
+1) Compilazione tempestiva dei fogli di allenamento settimanali.
+2) Invio del materiale fotografico concordato per la verifica dei risultati (da potersi utilizzare dal Coach a fini promozionali).
+3) Invio sistematico di brevi video d'esecuzione degli esercizi fisici per la correzione e la sicurezza della tecnica.
+
+ART. 3 - CLAUSOLA DI INTERRUZIONE E RECUPERO VALORE
+La costanza e la trasparenza sono requisiti minimi per il Coach. Nel caso in cui la Cliente salti consecutivamente l'invio delle foto di check-in, i video richiesti o la compilazione del diario per 2 volte consecutive, il Coach si riserva il diritto unilaterale di revocare la borsa di studio e interrompere con effetto immediato l'accesso alla piattaforma e alle schede d'allenamento. 
+
+Luogo: ______________ Data: ______________
+
+Firma Coach: _____________________  Firma Cliente: _____________________`;
+            }
+
+            document.getElementById('display-contract-body').innerText = text;
+        }
+
+        function copyContractToClipboard() {
+            const bodyText = document.getElementById('display-contract-body').innerText;
+            // Metodo di copia sicuro compatibile
+            const tempInput = document.createElement("textarea");
+            tempInput.value = bodyText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert("Contratto copiato negli appunti! Ora puoi incollarlo su un file Word o inviarlo via email.");
+        }
     </script>
 </body>
 </html>
