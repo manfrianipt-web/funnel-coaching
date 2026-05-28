@@ -749,16 +749,33 @@
     localStorage.setItem('coaching_leads', JSON.stringify(leads));
     if (typeof renderLeads === "function") { renderLeads(); }
 
-    // 4. Gestione delle schermate finali sul sito
-    document.getElementById('coaching-form').classList.add('hidden');
+    // 4. PREPARA IL TESTO DI RIEPILOGO PER WHATSAPP (Ripristinato dal tuo codice originale)
+    const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
+                        `• Nome: ${name}\n` +
+                        `• Contatto: ${contact}\n` +
+                        `• Età: ${age === 'target' ? '20-35 anni' : (age === 'under20' ? 'Sotto i 20' : 'Sopra i 35')}\n` +
+                        `• Consenso Foto: ${photos === 'yes' ? 'SI' : 'NO'}\n` +
+                        `• Consenso Video Tecnica: ${videos === 'yes' ? 'SI' : 'NO'}\n` +
+                        `• Attrezzatura: ${training_place === 'gym' ? 'Palestra' : (training_place === 'homegym' ? 'Home Gym' : (training_place === 'willing' ? 'Pronta a Iscriversi' : 'No attrezzi'))}\n` +
+                        `• Allena in Vacanza: ${summer === 'yes' ? 'SI' : 'NO'} (${stop_duration})\n` +
+                        `• Segue Alimentazione: ${diet === 'yes' ? 'SI' : 'NO'}\n` +
+                        `• Paura Pesi: ${weight_fear === 'no' ? 'No, vuole spingere' : (weight_fear === 'beginner' ? 'Principiante totale' : 'Sì, preoccupata')}\n` +
+                        `• Motivazione: ${motivation}`;
+
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=393513410313&text=${encodeURIComponent(textSummary)}`;
+
+    // 5. GESTIONE SCHERMATE E REINDIRIZZAMENTO (Ripristinato con gli ID corretti del tuo sito)
     if (status === "excluded") {
+        document.getElementById('form-screen').classList.add('hidden');
         document.getElementById('exclusion-screen').classList.remove('hidden');
     } else {
-        document.getElementById('success-screen').classList.remove('hidden');
+        window.open(whatsappUrl, '_blank');
+        document.getElementById('form-screen').classList.add('hidden');
+        document.getElementById('contract-screen').classList.remove('hidden');
+        if (typeof showContract === "function") { showContract(); }
     }
 
-    // 5. INVIO DEI DATI A GOOGLE SHEET
-    // Usa l'URL dell'applicazione web che hai ottenuto facendo il "Nuovo Deployment" su Apps Script
+    // 6. INVIO DEI DATI A GOOGLE SHEET IN BACKGROUND
     const webAppUrl = "https://script.google.com/macros/s/AKfycbw_urXMoGFyai-4gOZyYm8SNMKS1iEccbsXdKuedg9HrBRT4CBSaNVMx9avhb-0gGTP/exec";
 
     fetch(webAppUrl, {
