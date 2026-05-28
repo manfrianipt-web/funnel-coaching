@@ -706,105 +706,85 @@
         }
 
         // Gestore del salvataggio del modulo di candidatura
-        function handleFormSubmit(e) {
-            e.preventDefault();
+       function handleFormSubmit(e) {
+    e.preventDefault();
 
-            const name = document.getElementById('form-name').value;
-            const contact = document.getElementById('form-contact').value;
-            const age = document.querySelector('input[name="form-age"]:checked').value;
-            const photos = document.querySelector('input[name="form-photos"]:checked').value;
-            const videos = document.querySelector('input[name="form-videos"]:checked').value;
-            const summer = document.getElementById('form-summer').value;
-            const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop specificato";
-            const diet = document.getElementById('form-diet').value;
-            const training_place = document.querySelector('input[name="form-training-place"]:checked').value;
-            const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked').value;
-            const motivation = document.getElementById('form-motivation').value;
+    // 1. Recupero dei dati dai campi del modulo
+    const name = document.getElementById('form-name').value;
+    const contact = document.getElementById('form-contact').value;
+    const age = document.querySelector('input[name="form-age"]:checked')?.value || '';
+    const photos = document.querySelector('input[name="form-photos"]:checked')?.value || '';
+    const videos = document.querySelector('input[name="form-videos"]:checked')?.value || '';
+    const summer = document.getElementById('form-summer').value;
+    const stop_duration = document.getElementById('form-stop-duration').value || "Nessuno stop specificato";
+    const diet = document.getElementById('form-diet').value;
+    const training_place = document.querySelector('input[name="form-training-place"]:checked')?.value || '';
+    const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked')?.value || '';
+    const motivation = document.getElementById('form-motivation').value;
 
-            // Logica del filtro automatico di screening
-            let status = "eligible";
-            if (age !== "target" || photos === "no" || videos === "no" || training_place === "no-equip") {
-                status = "excluded";
-            }
+    // 2. Logica del filtro automatico (Idonea / Esclusa)
+    let status = "eligible";
+    if (age !== "target" || photos === "no" || videos === "no" || training_place === "no-equip") {
+        status = "excluded";
+    }
 
-            const newLead = {
-                id: Date.now(),
-                name,
-                contact,
-                age,
-                photos,
-                videos,
-                summer,
-                stop_duration,
-                diet,
-                training_place,
-                weight_fear,
-                motivation,
-                date: new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }),
-                status
-            };
+    // 3. Salva localmente per la dashboard del Coach (mantenuto dal tuo codice)
+    const newLead = {
+        id: Date.now(),
+        name,
+        contact,
+        age,
+        photos,
+        videos,
+        summer,
+        stop_duration,
+        diet,
+        training_place,
+        weight_fear,
+        motivation,
+        date: new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }),
+        status
+    };
+    leads.unshift(newLead);
+    localStorage.setItem('coaching_leads', JSON.stringify(leads));
+    if (typeof renderLeads === "function") { renderLeads(); }
 
-            // Salva nel database del browser (se è lo stesso del coach)
-            leads.unshift(newLead);
-            localStorage.setItem('coaching_leads', JSON.stringify(leads));
-            renderLeads();   
-     
-console.log("CIAO");
+    // 4. Gestione delle schermate finali sul sito
+    document.getElementById('coaching-form').classList.add('hidden');
+    if (status === "excluded") {
+        document.getElementById('exclusion-screen').classList.remove('hidden');
+    } else {
+        document.getElementById('success-screen').classList.remove('hidden');
+    }
 
-fetch("https://script.google.com/macros/s/AKfycbw_urXMoGFyai-4gOZyYm8SNMKS1iEccbsXdKuedg9HrBRT4CBSaNVMx9avhb-0gGTP/exec", {
-   method: "POST",
-    mode: "no-cors", // <--- AGGIUNTO per evitare blocchi CORS del browser
-    headers: {
-        "Content-Type": "application/json"
-    },  
-    body: JSON.stringify({
-        name: name,
-        contact: contact,
-        age: age,
-        photos: photos,
-        videos: videos,
-        summer: summer,
-        stop_duration: stop_duration,
-        diet: diet,
-        training_place: training_place,
-        weight_fear: weight_fear,
-        motivation: motivation,
-        status: status // <--- AGGIUNTO per mappare la colonna M "Stato"
+    // 5. INVIO DEI DATI A GOOGLE SHEET
+    // Usa l'URL dell'applicazione web che hai ottenuto facendo il "Nuovo Deployment" su Apps Script
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbw_urXMoGFyai-4gOZyYm8SNMKS1iEccbsXdKuedg9HrBRT4CBSaNVMx9avhb-0gGTP/exec";
+
+    fetch(webAppUrl, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            contact: contact,
+            age: age,
+            photos: photos,
+            videos: videos,
+            summer: summer,
+            stop_duration: stop_duration,
+            diet: diet,
+            training_place: training_place,
+            weight_fear: weight_fear,
+            motivation: motivation,
+            status: status
+        })
     })
-});
-            
-            // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
-            const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
-                                `• Nome: ${name}\n` +
-                                `• Contatto: ${contact}\n` +
-                                `• Età: ${age === 'target' ? '20-35 anni' : (age === 'under20' ? 'Sotto i 20' : 'Sopra i 35')}\n` +
-                                `• Consenso Foto: ${photos === 'yes' ? 'SI' : 'NO'}\n` +
-                                `• Consenso Video Tecnica: ${videos === 'yes' ? 'SI' : 'NO'}\n` +
-                                `• Attrezzatura: ${training_place === 'gym' ? 'Palestra' : (training_place === 'homegym' ? 'Home Gym' : (training_place === 'willing' ? 'Pronta a Iscriversi' : 'No attrezzi'))}\n` +
-                                `• Allena in Vacanza: ${summer === 'yes' ? 'SI' : 'NO'} (${stop_duration})\n` +
-                                `• Segue Alimentazione: ${diet === 'yes' ? 'SI' : 'NO'}\n` +
-                                `• Paura Pesi: ${weight_fear === 'no' ? 'No, vuole spingere' : (weight_fear === 'beginner' ? 'Principiante totale' : 'Sì, preoccupata')}\n` +
-                                `• Motivazione: ${motivation}`;
-
-            // 1. Configura link WhatsApp
-            const waPhone = settings.whatsapp;
-            const waEncodedText = encodeURIComponent(textSummary);
-            document.getElementById('btn-submit-whatsapp').href = `https://wa.me/${waPhone}?text=${waEncodedText}`;
-
-            // 2. Configura link Email
-            const emailReceiver = settings.email;
-            const emailSubject = encodeURIComponent(`Candidatura Ricomposizione - ${name}`);
-            const emailBody = encodeURIComponent(textSummary);
-            document.getElementById('btn-submit-email').href = `mailto:${emailReceiver}?subject=${emailSubject}&body=${emailBody}`;
-
-            // Nasconde il modulo e mostra la schermata di successo con i ponti di inoltro
-            document.getElementById('coaching-form').classList.add('hidden');
-            document.getElementById('success-screen').classList.remove('hidden');
-            
-            // Scorri in cima alla pagina per mostrare il successo
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
+    .then(() => console.log("Dati inviati a Google Sheet con successo!"))
+    .catch(err => console.error("Errore nell'invio a Google:", err));
+}
         // Renderizza la lista dei lead
         function renderLeads() {
             const list = document.getElementById('crm-leads-list');
