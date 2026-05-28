@@ -706,7 +706,7 @@
         }
 
         // Gestore del salvataggio del modulo di candidatura
-       function handleFormSubmit(e) {
+ function handleFormSubmit(e) {
     e.preventDefault();
 
     // 1. Recupero dei dati dai campi del modulo
@@ -722,13 +722,13 @@
     const weight_fear = document.querySelector('input[name="form-weight-fear"]:checked')?.value || '';
     const motivation = document.getElementById('form-motivation').value;
 
-    // 2. Logica del filtro automatico (Idonea / Esclusa)
+    // 2. Logica del filtro automatico (mantenuta per mostrare le schermate corrette sul sito e registrare lo stato nel foglio)
     let status = "eligible";
     if (age !== "target" || photos === "no" || videos === "no" || training_place === "no-equip") {
         status = "excluded";
     }
 
-    // 3. Salva localmente per la dashboard del Coach (mantenuto dal tuo codice)
+    // 3. Salva localmente per la dashboard del Coach
     const newLead = {
         id: Date.now(),
         name,
@@ -749,7 +749,7 @@
     localStorage.setItem('coaching_leads', JSON.stringify(leads));
     if (typeof renderLeads === "function") { renderLeads(); }
 
-    // 4. PREPARA IL TESTO DI RIEPILOGO PER WHATSAPP (Ripristinato dal tuo codice originale)
+    // 4. PREPARA IL TESTO DI RIEPILOGO PER WHATSAPP (Con indicazione dell'esito automatico)
     const textSummary = `PROGETTO RICOMPOSIZIONE CORPOREA - CANDIDATURA\n\n` +
                         `• Nome: ${name}\n` +
                         `• Contatto: ${contact}\n` +
@@ -760,16 +760,16 @@
                         `• Allena in Vacanza: ${summer === 'yes' ? 'SI' : 'NO'} (${stop_duration})\n` +
                         `• Segue Alimentazione: ${diet === 'yes' ? 'SI' : 'NO'}\n` +
                         `• Paura Pesi: ${weight_fear === 'no' ? 'No, vuole spingere' : (weight_fear === 'beginner' ? 'Principiante totale' : 'Sì, preoccupata')}\n` +
-                        `• Motivazione: ${motivation}`;
+                        `• Motivazione: ${motivation}\n\n` +
+                        `• Esito Filtro automatico: ${status === 'eligible' ? '🟢 IDONEA' : '🔴 ESCLUSA'}`;
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=393513410313&text=${encodeURIComponent(textSummary)}`;
 
-    // 5. GESTIONE SCHERMATE E REINDIRIZZAMENTO (Ripristinato con gli ID corretti del tuo sito)
+    // 5. GESTIONE SCHERMATE SUL SITO (Cambiano in base alle risposte, così sul sito l'esperienza resta coerente)
     if (status === "excluded") {
         document.getElementById('form-screen').classList.add('hidden');
         document.getElementById('exclusion-screen').classList.remove('hidden');
     } else {
-        window.open(whatsappUrl, '_blank');
         document.getElementById('form-screen').classList.add('hidden');
         document.getElementById('contract-screen').classList.remove('hidden');
         if (typeof showContract === "function") { showContract(); }
@@ -799,8 +799,11 @@
             status: status
         })
     })
-    .then(() => console.log("Dati inviati a Google Sheet con successo!"))
-    .catch(err => console.error("Errore nell'invio a Google:", err));
+    .then(() => console.log("Dati inviati a Google Sheet!"))
+    .catch(err => console.error("Errore foglio Google:", err));
+
+    // 7. APERTURA DI WHATSAPP (Estratto dal blocco "if": ora si attiva per QUALUNQUE combinazione di scelte!)
+    window.location.href = whatsappUrl;
 }
         // Renderizza la lista dei lead
         function renderLeads() {
