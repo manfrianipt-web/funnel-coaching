@@ -751,24 +751,26 @@
      
 console.log("CIAO");
 
-fetch("https://script.google.com/macros/s/AKfycbxpOLMwwjTejKG_lnrN6pJ1q_KreQvUY5BkXj4UIEGTIA3EyIpbhg4NNNrWJusV9Ys/exec", {
-    method: "POST",
+fetch("https://script.google.com/macros/s/AKfycbw_urXMoGFyai-4gOZyYm8SNMKS1iEccbsXdKuedg9HrBRT4CBSaNVMx9avhb-0gGTP/exec", {
+   method: "POST",
+    mode: "no-cors", // <--- AGGIUNTO per evitare blocchi CORS del browser
     headers: {
         "Content-Type": "application/json"
     },  
     body: JSON.stringify({
-    name: name,
-    contact: contact,
-    age: age,
-    photos: photos,
-    videos: videos,
-    summer: summer,
-    stop_duration: stop_duration,
-    diet: diet,
-    training_place: training_place,
-    weight_fear: weight_fear,
-    motivation: motivation
-})
+        name: name,
+        contact: contact,
+        age: age,
+        photos: photos,
+        videos: videos,
+        summer: summer,
+        stop_duration: stop_duration,
+        diet: diet,
+        training_place: training_place,
+        weight_fear: weight_fear,
+        motivation: motivation,
+        status: status // <--- AGGIUNTO per mappare la colonna M "Stato"
+    })
 });
             
             // PREPARA IL PONTE DI INVIO DATI (Riepilogo formattato in testo)
